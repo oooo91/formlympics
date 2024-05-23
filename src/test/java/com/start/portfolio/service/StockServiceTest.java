@@ -2,11 +2,11 @@ package com.start.portfolio.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import com.start.portfolio.entity.Stock;
+import com.start.portfolio.entity.Product;
 import com.start.portfolio.facade.LettuceLockStockFacade;
 import com.start.portfolio.facade.OptimisticLockStockFacade;
 import com.start.portfolio.facade.RedissonLockStockFacade;
-import com.start.portfolio.repository.StockRepository;
+import com.start.portfolio.repository.ProductRepository;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -25,25 +25,24 @@ class StockServiceTest {
 	@Autowired
 	private StockService stockService;
 	@Autowired
+	private ProductRepository productRepository;
+	@Autowired
 	private OptimisticLockStockFacade optimisticLockStockFacade;
-	@Autowired
-	private StockRepository stockRepository;
-	@Autowired
-	private LettuceLockStockFacade lettuceLockStockFacade;
 	@Autowired
 	private RedissonLockStockFacade redissonLockStockFacade;
 
+
 	@BeforeEach
 	public void before() {
-		stockRepository.saveAndFlush(Stock.builder()
-			.quantity(100L)
-			.productId(1L)
+		productRepository.saveAndFlush(Product.builder()
+			.stock(100L)
+			.id(1L)
 			.build());
 	}
 
 	@AfterEach
 	public void after() {
-		stockRepository.deleteAll();
+		productRepository.deleteAll();
 	}
 
 	@Test
@@ -51,9 +50,9 @@ class StockServiceTest {
 	public void decreaseStock() {
 		stockService.decrease(1L, 1L); // TODO 수량 1 감소
 
-		Stock stock = stockRepository.findById(1L).orElseThrow();
+		Product product = productRepository.findById(1L).orElseThrow();
 
-		assertEquals(99, stock.getQuantity());
+		assertEquals(99, product.getStock());
 	}
 
 	@Test
@@ -79,8 +78,8 @@ class StockServiceTest {
 
 		latch.await();
 
-		Stock stock = stockRepository.findById(1L).orElseThrow();
-		assertEquals(0, stock.getQuantity()); // 100 - (1 * 100) = 0
+		Product product = productRepository.findById(1L).orElseThrow();
+		assertEquals(0, product.getStock()); // 100 - (1 * 100) = 0
 
 		log.info("테스트 진행 시간 : {} 초", (System.currentTimeMillis() - startTime) / 1000.0);
 	}
@@ -106,8 +105,8 @@ class StockServiceTest {
 
 		latch.await();
 
-		Stock stock = stockRepository.findById(1L).orElseThrow();
-		assertEquals(0, stock.getQuantity()); // 100 - (1 * 100) = 0
+		Product product = productRepository.findById(1L).orElseThrow();
+		assertEquals(0, product.getStock()); // 100 - (1 * 100) = 0
 
 		log.info("테스트 진행 시간 : {} 초", (System.currentTimeMillis() - startTime) / 1000.0);
 	}

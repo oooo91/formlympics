@@ -1,7 +1,7 @@
 package com.start.portfolio.util;
 
-import com.start.portfolio.entity.order.User;
-import com.start.portfolio.repository.order.UserRepository;
+import com.start.portfolio.entity.User;
+import com.start.portfolio.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
