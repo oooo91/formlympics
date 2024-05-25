@@ -28,6 +28,7 @@ public class CustomAuthUserResolver implements HandlerMethodArgumentResolver {
 		NativeWebRequest webRequest, WebDataBinderFactory binderFactory) throws Exception {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		if (authentication != null && authentication.getPrincipal() instanceof CustomUserDetails) {
+			log.info("CustomUserResolver - 사용자 ID: {}", ((CustomUserDetails) authentication.getPrincipal()).getId());
 			return ((CustomUserDetails) authentication.getPrincipal()).getId();
 		}
 		throw new UnauthorizedException("인증되지 않은 사용자 입니다.");

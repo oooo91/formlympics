@@ -15,6 +15,7 @@ import com.start.portfolio.repository.OrdersRepository;
 import com.start.portfolio.repository.ProductRepository;
 import com.start.portfolio.repository.UserRepository;
 import java.util.List;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -66,6 +67,18 @@ public class FormService {
 	}
 
 	@Transactional
+	public void modifyForm(Long userId, Long formId, FormDto.Request request) {
+
+		Form form = formRepository.findById(formId)
+			.orElseThrow(() -> new RuntimeException("삭제된 폼입니다."));
+
+		if (!Objects.equals(form.getUser().getId(), userId)) {
+			throw new RuntimeException("권한이 없습니다.");
+		}
+		form.update(request);
+	}
+
+	@Transactional
 	public void order(Long userId, List<OrdersDto.Request> requests) {
 
 		// TODO 주문 내역 저장 및 재고 감소
@@ -90,13 +103,5 @@ public class FormService {
 
 		ordersRepository.saveAll(ordersList);
 
-	}
-
-	@Transactional
-	public Response modifyForm(Long formId, FormDto.Request request) {
-		Form form = formRepository.findById(formId)
-			.orElseThrow(() -> new RuntimeException("삭제된 폼입니다."));
-
-		return form.update(request).toDto();
 	}
 }

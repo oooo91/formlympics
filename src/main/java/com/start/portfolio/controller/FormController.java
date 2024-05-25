@@ -25,7 +25,7 @@ public class FormController {
 	private final FormService formService;
 
 	// TODO 판매폼 작성
-	@PostMapping("/form")
+	@PostMapping("")
 	public ResponseEntity<String> saveForm(@CustomAuthUser Long userId,
 		@RequestBody FormDto.Request request) {
 		formService.saveForm(userId, request);
@@ -33,22 +33,25 @@ public class FormController {
 	}
 
 	// TODO 판매폼 조회
-	@GetMapping("/form/{id}")
+	@GetMapping("/{id}")
 	public FormDto.Response getForm(@PathVariable(name = "id") Long formId) {
 		return formService.getForm(formId);
 	}
 
 	// TODO 판매폼 수정
-	@PutMapping("/form/{id}")
-	public FormDto.Response modifyForm(@PathVariable(name = "id") Long formId,
+	@PutMapping("/{id}")
+	public ResponseEntity<String> modifyForm(@PathVariable(name = "id") Long formId,
+		@CustomAuthUser Long userId,
 		@RequestBody FormDto.Request request) {
-		return formService.modifyForm(formId, request);
+		formService.modifyForm(userId, formId, request);
+		return ResponseEntity.ok("판매 폼을 수정했습니다.");
 	}
 
 	// TODO 상품 구매 -> 선착순 주문, 재고 감소
 	@PostMapping("/order")
-	public void order(@CustomAuthUser Long userId, @RequestBody List<OrdersDto.Request> requests) {
+	public ResponseEntity<String> order(@CustomAuthUser Long userId, @RequestBody List<OrdersDto.Request> requests) {
 		formService.order(userId, requests);
+		return ResponseEntity.ok("상품 주문이 완료되었습니다. 이체를 진행해주세요.");
 	}
 
 	// TODO 좋아요
