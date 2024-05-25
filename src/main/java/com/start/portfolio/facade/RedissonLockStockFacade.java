@@ -30,6 +30,8 @@ public class RedissonLockStockFacade {
 			stockService.decrease(id, quantity);
 		} catch (InterruptedException e) {
 			log.warn("LOCK 획득 실패 - 예외 발생: {}", e.getMessage());
+		} catch (Exception e) {
+			log.error("예상치 못한 예외 발생: {}", e.getMessage());
 		} finally {
 			lock.unlock();
 			log.info("LOCK 해제");

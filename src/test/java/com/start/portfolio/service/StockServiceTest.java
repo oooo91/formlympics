@@ -31,15 +31,6 @@ class StockServiceTest {
 	@Autowired
 	private RedissonLockStockFacade redissonLockStockFacade;
 
-
-	@BeforeEach
-	public void before() {
-		productRepository.saveAndFlush(Product.builder()
-			.stock(100L)
-			.id(1L)
-			.build());
-	}
-
 	@AfterEach
 	public void after() {
 		productRepository.deleteAll();
@@ -61,13 +52,17 @@ class StockServiceTest {
 		int count = 100;
 		long startTime = System.currentTimeMillis();
 
+		Product product = productRepository.saveAndFlush(Product.builder()
+			.stock(100L)
+			.build());
+
 		ExecutorService executorService = Executors.newFixedThreadPool(32); // TODO 별도의 스레드 풀 생성 -> 최대 동시 요청 32개 허용
 		CountDownLatch latch = new CountDownLatch(count);
 
 		for (int i = 0; i < count; i++) {
 			executorService.submit(() -> {
 				try {
-					optimisticLockStockFacade.decrease(1L, 1L); // TODO 수량 1 감소
+					optimisticLockStockFacade.decrease(product.getId(), 1L); // TODO 수량 1 감소
 				} catch (InterruptedException e) {
 					throw new RuntimeException(e);
 				} finally {
@@ -78,8 +73,8 @@ class StockServiceTest {
 
 		latch.await();
 
-		Product product = productRepository.findById(1L).orElseThrow();
-		assertEquals(0, product.getStock()); // 100 - (1 * 100) = 0
+		Product reducedProduct = productRepository.findById(product.getId()).orElseThrow();
+		assertEquals(0, reducedProduct.getStock()); // 100 - (1 * 100) = 0
 
 		log.info("테스트 진행 시간 : {} 초", (System.currentTimeMillis() - startTime) / 1000.0);
 	}
@@ -90,13 +85,17 @@ class StockServiceTest {
 		int count = 100;
 		long startTime = System.currentTimeMillis();
 
+		Product product = productRepository.saveAndFlush(Product.builder()
+			.stock(100L)
+			.build());
+
 		ExecutorService executorService = Executors.newFixedThreadPool(32); // TODO 별도의 스레드 풀 생성 -> 최대 동시 요청 32개 허용
 		CountDownLatch latch = new CountDownLatch(count);
 
 		for (int i = 0; i < count; i++) {
 			executorService.submit(() -> {
 				try {
-					redissonLockStockFacade.decrease(1L, 1L); // TODO 수량 1 감소
+					redissonLockStockFacade.decrease(product.getId(), 1L); // TODO 수량 1 감소
 				} finally {
 					latch.countDown();
 				}
@@ -105,8 +104,8 @@ class StockServiceTest {
 
 		latch.await();
 
-		Product product = productRepository.findById(1L).orElseThrow();
-		assertEquals(0, product.getStock()); // 100 - (1 * 100) = 0
+		Product reducedProduct = productRepository.findById(product.getId()).orElseThrow();
+		assertEquals(0, reducedProduct.getStock()); // 100 - (1 * 100) = 0
 
 		log.info("테스트 진행 시간 : {} 초", (System.currentTimeMillis() - startTime) / 1000.0);
 	}

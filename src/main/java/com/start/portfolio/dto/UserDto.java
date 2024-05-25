@@ -6,7 +6,7 @@ import lombok.Getter;
 
 public class UserDto {
 
-	public record Request(
+	public record SignUpRequest(
 		String name,
 		String email,
 		String password,
@@ -20,6 +20,11 @@ public class UserDto {
 				.build();
 		}
 	}
+
+	public record SignInRequest(
+		String email,
+		String password
+	) {}
 
 	@Builder
 	@Getter

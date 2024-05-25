@@ -20,7 +20,7 @@ public class FormDto {
 		LocalDateTime depositEndDate,
 		List<ProductDto.Request> productList
 	) {
-		public Form toFormEntity() {
+		public Form toEntity() {
 			return Form.builder()
 				.title(title)
 				.content(content)

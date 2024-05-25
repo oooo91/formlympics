@@ -25,15 +25,23 @@ public class UserController {
 
 	// TODO 회원가입
 	@PostMapping("/signup")
-	public ResponseEntity<String> signup(@RequestBody UserDto.Request request) {
+	public ResponseEntity<String> signup(@RequestBody UserDto.SignUpRequest request) {
 		userService.signup(request);
 		return ResponseEntity.ok("회원가입 성공");
+	}
+
+	// TODO 로그인
+	@PostMapping("/signIn")
+	public String signIn(@RequestBody UserDto.SignInRequest request) {
+		log.info("user email = {}", request.email());
+		return userService.signIn(request);
 	}
 
 	// TODO 주소 기입
 	@PostMapping("/address")
 	public ResponseEntity<String> saveAddress(@CustomAuthUser Long userId,
 		@RequestBody AddressDto.Request request) {
+		log.info("들어오나..." + userId);
 		userService.saveAddress(userId, request);
 		return ResponseEntity.ok("주소저장 성공");
 	}
