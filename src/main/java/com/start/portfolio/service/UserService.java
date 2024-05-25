@@ -62,9 +62,9 @@ public class UserService {
 			.orElseThrow(() -> new RuntimeException("사용자가 없습니다."));
 		Address address = request.toEntity();
 		address.setUser(user);
-
 		addressRepository.save(address);
 
+		user.setAddress(address);
 	}
 
 	@Transactional
@@ -74,8 +74,9 @@ public class UserService {
 			.orElseThrow(() -> new RuntimeException("사용자가 없습니다."));
 		Refund refund = request.toEntity();
 		refund.setUser(user);
-
 		refundRepository.save(refund);
+
+		user.setRefund(refund);
 	}
 
 	@Transactional(readOnly = true)
@@ -83,11 +84,11 @@ public class UserService {
 		User user = userRepository.findById(userId)
 			.orElseThrow(() -> new RuntimeException("사용자가 없습니다."));
 
-		Optional<Refund> optionalRefund = refundRepository.findById(userId);
+		Optional<Refund> optionalRefund = refundRepository.findById(user.getRefund().getId());
 		RefundDto.Response refundResponse = optionalRefund.map(Refund::toDto)
 			.orElse(RefundDto.Response.builder().build());
 
-		Optional<Address> optionalAddress = addressRepository.findById(userId);
+		Optional<Address> optionalAddress = addressRepository.findById(user.getAddress().getId());
 		AddressDto.Response addressResponse = optionalAddress.map(Address::toDto)
 			.orElse(AddressDto.Response.builder().build());
 
