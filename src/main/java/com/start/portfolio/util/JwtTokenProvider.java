@@ -27,7 +27,7 @@ public class JwtTokenProvider {
 	@Value("${jwt.secret}")
 	private String secretKey;
 
-	@Value("${jwt.token-validation-in-seconds")
+	@Value("${jwt.token-validation-in-seconds}")
 	private long tokenValidTime;
 
 	private final UserDetailsService userDetailsService;
@@ -39,8 +39,8 @@ public class JwtTokenProvider {
 	}
 
 	// JWT 토큰 생성
-	public String createToken(String userPk, List<String> roles) {
-		Claims claims = Jwts.claims().setSubject(userPk);
+	public String createToken(Long userPk) {
+		Claims claims = Jwts.claims().setSubject(String.valueOf(userPk));
 		Date now = new Date();
 
 		return Jwts.builder()

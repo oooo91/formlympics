@@ -36,7 +36,7 @@ public class FormService {
 		User user = userRepository.findById(userId)
 			.orElseThrow(() -> new RuntimeException("사용자가 없습니다."));
 
-		Form form = request.toFormEntity();
+		Form form = request.toEntity();
 		form.setUser(user);
 		Form savedForm = formRepository.save(form);
 
