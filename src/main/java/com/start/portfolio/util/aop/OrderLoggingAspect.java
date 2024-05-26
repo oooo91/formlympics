@@ -17,11 +17,11 @@ public class OrderLoggingAspect {
 
 	@Around("logAroundOrderPointcut()")
 	public Object logAroundOrder(ProceedingJoinPoint joinPoint) throws Throwable {
-		log.info("OrderLoggingAspect - 사용자 ID : {} 의 주문을 처리합니다.", joinPoint.getArgs()[0]);
+		log.info("OrderLoggingAspect - 사용자 ID : {} - {} 실행 시작", joinPoint.getArgs()[0], joinPoint.getSignature().getName());
 
 		Object result = joinPoint.proceed();
 
-		log.info("OrderLoggingAspect - 사용자 ID : {} 의 주문 처리를 완료했습니다.", joinPoint.getArgs()[0]);
+		log.info("OrderLoggingAspect - 사용자 ID : {} - {} 실행 종료", joinPoint.getArgs()[0], joinPoint.getSignature().getName());
 		return result;
 	}
 
