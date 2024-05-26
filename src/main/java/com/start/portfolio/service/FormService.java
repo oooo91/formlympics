@@ -1,7 +1,6 @@
 package com.start.portfolio.service;
 
 import com.start.portfolio.dto.FormDto;
-import com.start.portfolio.dto.FormDto.Response;
 import com.start.portfolio.dto.OrdersDto;
 import com.start.portfolio.dto.ProductDto;
 import com.start.portfolio.entity.Form;
@@ -14,6 +13,7 @@ import com.start.portfolio.repository.FormRepository;
 import com.start.portfolio.repository.OrdersRepository;
 import com.start.portfolio.repository.ProductRepository;
 import com.start.portfolio.repository.UserRepository;
+import com.start.portfolio.util.aop.LogAroundOrder;
 import java.util.List;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
@@ -79,6 +79,7 @@ public class FormService {
 	}
 
 	@Transactional
+	@LogAroundOrder
 	public void order(Long userId, List<OrdersDto.Request> requests) {
 
 		// TODO 주문 내역 저장 및 재고 감소
