@@ -3,7 +3,6 @@ package com.start.portfolio.service;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.start.portfolio.entity.Product;
-import com.start.portfolio.facade.LettuceLockStockFacade;
 import com.start.portfolio.facade.OptimisticLockStockFacade;
 import com.start.portfolio.facade.RedissonLockStockFacade;
 import com.start.portfolio.repository.ProductRepository;
@@ -11,17 +10,19 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.TestPropertySource;
 
 @Slf4j
 @SpringBootTest
+@TestPropertySource(properties = "spring.config.location=classpath:application-test.yml" )
 class StockServiceTest {
 
+	@Autowired
+	private FormService formService;
 	@Autowired
 	private StockService stockService;
 	@Autowired
@@ -30,11 +31,6 @@ class StockServiceTest {
 	private OptimisticLockStockFacade optimisticLockStockFacade;
 	@Autowired
 	private RedissonLockStockFacade redissonLockStockFacade;
-
-	@AfterEach
-	public void after() {
-		productRepository.deleteAll();
-	}
 
 	@Test
 	@DisplayName("재고 감소 - 1개의 요청")
