@@ -30,6 +30,7 @@ public class FormService {
 	private final FormRepository formRepository;
 	private final ProductRepository productRepository;
 	private final OrdersRepository ordersRepository;
+	private final OrderExceptionLogService orderExceptionLogService;
 	private final RedissonLockStockFacade redissonLockStockFacade;
 
 	@Transactional
@@ -82,27 +83,31 @@ public class FormService {
 	@LogAroundOrder
 	public void order(Long userId, List<OrdersDto.Request> requests) {
 
-		// TODO 주문 내역 저장 및 재고 감소
-		User user = userRepository.findById(userId)
-			.orElseThrow(() -> new RuntimeException("사용자가 없습니다."));
+		try {
+			// TODO 주문 내역 저장 및 재고 감소
+			User user = userRepository.findById(userId)
+				.orElseThrow(() -> new RuntimeException("사용자가 없습니다."));
 
-		List<Orders> ordersList = requests.stream()
-			.map(dto -> {
-				Product product = productRepository.findById(dto.productId())
-					.orElseThrow(() -> new RuntimeException("상품이 없습니다."));
-				redissonLockStockFacade.decrease(product.getId(), dto.quantity());
+			List<Orders> ordersList = requests.stream()
+				.map(dto -> {
+					Product product = productRepository.findById(dto.productId())
+						.orElseThrow(() -> new RuntimeException("상품이 없습니다."));
+					redissonLockStockFacade.decrease(product.getId(), dto.quantity());
 
-				return Orders.builder()
-					.totalPrice(product.getPrice() * dto.quantity())
-					.depositName(dto.depositName())
-					.quantity(dto.quantity())
-					.orderStatus(OrderStatus.CREATED)
-					.product(product)
-					.user(user)
-					.build();
-			}).toList();
+					return Orders.builder()
+						.totalPrice(product.getPrice() * dto.quantity())
+						.depositName(dto.depositName())
+						.quantity(dto.quantity())
+						.orderStatus(OrderStatus.CREATED)
+						.product(product)
+						.user(user)
+						.build();
+				}).toList();
 
-		ordersRepository.saveAll(ordersList);
+			ordersRepository.saveAll(ordersList);
+		} catch (RuntimeException e) {
+			orderExceptionLogService.saveLog(userId, e.getMessage());
+		}
 
 	}
 }
