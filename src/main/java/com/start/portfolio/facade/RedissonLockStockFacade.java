@@ -20,7 +20,7 @@ public class RedissonLockStockFacade {
 		RLock lock = redissonClient.getLock(id.toString());
 
 		try {
-			boolean available = lock.tryLock(10, 1, TimeUnit.SECONDS); //락을 시도하는 최대 시간, 락의 만료 시간(락을 획득하면 1초 동안 유지
+			boolean available = lock.tryLock(10, 2, TimeUnit.SECONDS); //락을 시도하는 최대 시간, 락의 만료 시간(락을 획득하면 1초 동안 유지
 			if (!available) {
 				log.warn("LOCK 획득 실패");
 				return;
@@ -30,8 +30,10 @@ public class RedissonLockStockFacade {
 			stockService.decrease(id, quantity);
 		} catch (InterruptedException e) {
 			log.warn("LOCK 획득 실패 - 예외 발생: {}", e.getMessage());
+			throw new RuntimeException(e);
 		} catch (Exception e) {
-			log.error("예상치 못한 예외 발생: {}", e.getMessage());
+			log.error("예상치 못한 에러 발생: {}", e.getMessage());
+			throw new RuntimeException(e);
 		} finally {
 			lock.unlock();
 			log.info("LOCK 해제");
