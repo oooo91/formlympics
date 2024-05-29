@@ -13,7 +13,7 @@ import com.start.portfolio.repository.FormRepository;
 import com.start.portfolio.repository.OrdersRepository;
 import com.start.portfolio.repository.ProductRepository;
 import com.start.portfolio.repository.UserRepository;
-import com.start.portfolio.util.aop.LogAroundOrder;
+import com.start.portfolio.util.aop.LogAroundLogin;
 import java.util.List;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
@@ -80,7 +80,7 @@ public class FormService {
 	}
 
 	@Transactional
-	@LogAroundOrder
+	@LogAroundLogin
 	public void order(Long userId, List<OrdersDto.Request> requests) {
 
 		try {

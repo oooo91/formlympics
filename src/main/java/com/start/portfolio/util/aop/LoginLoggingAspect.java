@@ -10,9 +10,9 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Aspect
 @Component
-public class OrderLoggingAspect {
+public class LoginLoggingAspect {
 
-	@Pointcut("@annotation(com.start.portfolio.util.aop.LogAroundOrder)")
+	@Pointcut("@annotation(com.start.portfolio.util.aop.LogAroundLogin)")
 	public void logAroundOrderPointcut() {}
 
 	@Around("logAroundOrderPointcut()")
