@@ -31,4 +31,4 @@
         - 문제 → 요청 건 별로 정상적으로 트랜잭션이 적용되었는지 로그로 확인 불가능
         - 해결
             - 주문 실패 시 실패한 기록을 확인하기 위해 로그를 저장하는 로직을 별도의 트랜잭션으로 분리
-            - 해당 로직이 새로운 물리 트랜잭션을 사용하도록 @Transactional 의 propagation 속성을 `*REQUIRES_NEW*` 로 설정
+            - 해당 로직이 새로운 물리 트랜잭션을 사용하도록 @Transactional 의 propagation 속성을 `REQUIRES_NEW` 로 설정
