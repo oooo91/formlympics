@@ -22,8 +22,6 @@ import org.springframework.test.context.TestPropertySource;
 class StockServiceTest {
 
 	@Autowired
-	private FormService formService;
-	@Autowired
 	private StockService stockService;
 	@Autowired
 	private ProductRepository productRepository;

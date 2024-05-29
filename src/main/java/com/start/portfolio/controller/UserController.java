@@ -4,15 +4,18 @@ import com.start.portfolio.dto.AddressDto;
 import com.start.portfolio.dto.MyInfoDto;
 import com.start.portfolio.dto.RefundDto;
 import com.start.portfolio.dto.UserDto;
+import com.start.portfolio.service.CouponService;
 import com.start.portfolio.service.UserService;
 import com.start.portfolio.util.annotation.CustomAuthUser;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.annotations.Parameter;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
@@ -22,6 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserController {
 
 	private final UserService userService;
+	private final CouponService couponService;
 
 	// TODO 회원가입
 	@PostMapping("/signup")
@@ -58,6 +62,14 @@ public class UserController {
 	@GetMapping("/myInfo")
 	public MyInfoDto.Response getMyInfo(@CustomAuthUser Long userId) {
 		return userService.getMyInfo(userId);
+	}
+
+	// TODO 쿠폰 발급
+	@PostMapping("/coupon")
+	public ResponseEntity<String> getCoupon(@CustomAuthUser Long userId,
+		@RequestParam(name = "couponId") Long couponId) {
+		couponService.getCoupon(userId, couponId);
+		return ResponseEntity.ok("쿠폰이 발급되었습니다.");
 	}
 
 }
