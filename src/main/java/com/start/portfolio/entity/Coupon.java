@@ -31,10 +31,9 @@ public class Coupon {
 	private String couponName;
 	private Long couponAmount; //쿠폰 금액
 	private Long totalCouponQuantity; //쿠폰 수량
-	private Long remainingCouponQuantity; //남은 쿠폰 수량
-
+	private Long issuedCouponCount; //발급된 쿠폰 수
 	public void update() {
-		this.remainingCouponQuantity = remainingCouponQuantity - 1;
+		this.issuedCouponCount = issuedCouponCount + 1;
 	}
 
 	@Builder
@@ -42,11 +41,11 @@ public class Coupon {
 		String couponName,
 		Long couponAmount,
 		Long totalCouponQuantity,
-		Long remainingCouponQuantity
+		Long issuedCouponCount
 	){
 		this.couponName = couponName;
 		this.couponAmount = couponAmount;
 		this.totalCouponQuantity = totalCouponQuantity;
-		this.remainingCouponQuantity = remainingCouponQuantity;
+		this.issuedCouponCount = issuedCouponCount;
 	}
 }

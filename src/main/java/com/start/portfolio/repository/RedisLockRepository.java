@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 public class RedisLockRepository {
 
 	private final RedisTemplate<String, String> redisTemplate;
-
+	
 	// TODO LOCK 메서드 (setnx 1 lock)
 	public Boolean lock(Long key) {
 		return redisTemplate
