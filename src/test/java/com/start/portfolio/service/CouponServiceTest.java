@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.start.portfolio.entity.Coupon;
 import com.start.portfolio.facade.RedissonLockCouponFacade;
-import com.start.portfolio.repository.CouponCountRepository;
 import com.start.portfolio.repository.CouponRepository;
 import com.start.portfolio.repository.UserCouponRepository;
 import java.util.concurrent.CountDownLatch;
@@ -28,16 +27,9 @@ class CouponServiceTest {
 	@Autowired
 	private CouponRepository couponRepository;
 	@Autowired
-	private CouponCountRepository couponCountRepository;
-	@Autowired
 	private UserCouponRepository userCouponRepository;
 	@Autowired
 	private RedissonLockCouponFacade redissonLockCouponFacade;
-
-	@BeforeEach
-	public void setUp() {
-		couponCountRepository.setUp();
-	}
 
 	@Test
 	@DisplayName("한 번만 응모")
@@ -57,6 +49,9 @@ class CouponServiceTest {
 	@Test
 	@DisplayName("여러 번 응모")
 	public void concurrentCouponApplications() throws InterruptedException {
+		int threadCount = 1000;
+		long startTime = System.currentTimeMillis();
+
 		Coupon coupon = couponRepository.save(
 			Coupon.builder()
 				.couponName("백원쿠폰")
@@ -66,7 +61,6 @@ class CouponServiceTest {
 				.build()
 		);
 
-		int threadCount = 1000;
 		ExecutorService executorService = Executors.newFixedThreadPool(32);
 		CountDownLatch latch = new CountDownLatch(threadCount); //CountDownLatch -> 다른 스레드 작업 기다림
 
@@ -84,5 +78,7 @@ class CouponServiceTest {
 
 		long count = userCouponRepository.countByCouponId(coupon.getId());
 		assertThat(count).isEqualTo(100);
+
+		log.info("테스트 진행 시간 : {} 초", (System.currentTimeMillis() - startTime) / 1000.0);
 	}
 }

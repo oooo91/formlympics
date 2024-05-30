@@ -36,7 +36,6 @@ public class CouponService {
 			.orElseThrow(() -> new RuntimeException("존재하지 않는 쿠폰입니다."));
 
 		Long issuedCouponCount = coupon.getIssuedCouponCount();
-		//Long count = couponCountRepository.increment();
 		log.info("race condition = {}", issuedCouponCount);
 
 		if (issuedCouponCount >= coupon.getTotalCouponQuantity()) {
