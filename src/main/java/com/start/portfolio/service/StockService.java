@@ -15,8 +15,8 @@ public class StockService {
 	@Transactional
 	public void decrease(Long id, Long quantity) {
 		//TODO 재고 조회
-		Product product = productRepository.findById(id)
-			.orElseThrow(() -> new RuntimeException("재고가 없습니다."));
+		Product product = productRepository.findByIdWithPessimisticLock(id)
+			.orElseThrow(() -> new RuntimeException("재고가 없습니다.")); // 트랜잭션이 종료될 때까지 락 유지
 
 		//TODO 재고 감소
 		product.decrease(quantity);

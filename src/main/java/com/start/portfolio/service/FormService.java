@@ -8,7 +8,6 @@ import com.start.portfolio.entity.Orders;
 import com.start.portfolio.entity.Product;
 import com.start.portfolio.entity.User;
 import com.start.portfolio.enums.OrderStatus;
-import com.start.portfolio.facade.RedissonLockStockFacade;
 import com.start.portfolio.repository.FormRepository;
 import com.start.portfolio.repository.OrdersRepository;
 import com.start.portfolio.repository.ProductRepository;
@@ -31,7 +30,7 @@ public class FormService {
 	private final ProductRepository productRepository;
 	private final OrdersRepository ordersRepository;
 	private final OrderExceptionLogService orderExceptionLogService;
-	private final RedissonLockStockFacade redissonLockStockFacade;
+	private final StockService stockService;
 
 	@Transactional
 	public void saveForm(Long userId, FormDto.Request request) {
@@ -92,7 +91,7 @@ public class FormService {
 				.map(dto -> {
 					Product product = productRepository.findById(dto.productId())
 						.orElseThrow(() -> new RuntimeException("상품이 없습니다."));
-					redissonLockStockFacade.decrease(product.getId(), dto.quantity());
+					stockService.decrease(product.getId(), dto.quantity());
 
 					return Orders.builder()
 						.totalPrice(product.getPrice() * dto.quantity())
