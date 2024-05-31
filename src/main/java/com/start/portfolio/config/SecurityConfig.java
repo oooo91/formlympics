@@ -1,8 +1,6 @@
-package com.start.portfolio.filter.config;
+package com.start.portfolio.config;
 
-import static org.springframework.security.config.Customizer.withDefaults;
-
-import com.start.portfolio.filter.JwtAuthenticationFilter;
+import com.start.portfolio.config.filter.JwtAuthenticationFilter;
 import com.start.portfolio.util.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;

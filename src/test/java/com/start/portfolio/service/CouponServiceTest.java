@@ -3,14 +3,13 @@ package com.start.portfolio.service;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.start.portfolio.entity.Coupon;
-import com.start.portfolio.facade.RedissonLockCouponFacade;
+import com.start.portfolio.util.facade.RedissonLockCouponFacade;
 import com.start.portfolio.repository.CouponRepository;
 import com.start.portfolio.repository.UserCouponRepository;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

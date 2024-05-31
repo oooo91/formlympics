@@ -1,4 +1,4 @@
-package com.start.portfolio.filter.config;
+package com.start.portfolio.config;
 
 import com.start.portfolio.util.resolver.CustomAuthUserResolver;
 import java.util.List;
