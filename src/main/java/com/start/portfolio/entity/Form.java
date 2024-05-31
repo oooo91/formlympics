@@ -40,7 +40,7 @@ public class Form {
 	private List<Product> product;
 
 	@OneToMany(mappedBy = "form", fetch = FetchType.LAZY)
-	private List<Cart> cart;
+	private List<Cart> carts;
 
 	private String title;
 	private String content;

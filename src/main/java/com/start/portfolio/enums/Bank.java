@@ -1,5 +1,10 @@
 package com.start.portfolio.enums;
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+
+@Getter
+@RequiredArgsConstructor
 public enum Bank {
 	KEB_HANA_BANK("KEB하나은행"),
 	SHINHAN_BANK("신한은행"),
@@ -11,12 +16,4 @@ public enum Bank {
 	K_BANK("케이뱅크");
 
 	private final String koreaName;
-
-	Bank(String koreaName) {
-		this.koreaName = koreaName;
-	}
-
-	public String getKoreaName() {
-		return koreaName;
-	}
 }

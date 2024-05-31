@@ -1,5 +1,7 @@
 package com.start.portfolio.controller;
 
+import com.start.portfolio.dto.AlarmDto;
+import com.start.portfolio.dto.AlarmDto.Response;
 import com.start.portfolio.dto.FormDto;
 import com.start.portfolio.dto.OrdersDto;
 import com.start.portfolio.service.FormService;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
@@ -54,7 +57,17 @@ public class FormController {
 		return ResponseEntity.ok("상품 주문이 완료되었습니다. 이체를 진행해주세요.");
 	}
 
-	// TODO 좋아요
+	// TODO 좋아요 누른 사람
+	@PostMapping("/alarm/{id}")
+	public void alarm(@RequestBody AlarmDto.Request request, @CustomAuthUser Long userId, @PathVariable(name = "id") Long formId) {
+		formService.alarm(userId, formId, request);
+	}
+
+	// TODO 좋아요 받은 사람
+	@GetMapping("/alarm")
+	public List<Response> alarmList(@CustomAuthUser Long userId) {
+		return formService.alarmList(userId);
+	}
 
 	// TODO DM
 

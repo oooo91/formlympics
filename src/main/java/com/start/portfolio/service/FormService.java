@@ -1,13 +1,21 @@
 package com.start.portfolio.service;
 
+import com.start.portfolio.dto.AlarmDto;
+import com.start.portfolio.dto.AlarmDto.Response;
 import com.start.portfolio.dto.FormDto;
 import com.start.portfolio.dto.OrdersDto;
 import com.start.portfolio.dto.ProductDto;
+import com.start.portfolio.entity.Alarm;
+import com.start.portfolio.entity.Cart;
 import com.start.portfolio.entity.Form;
 import com.start.portfolio.entity.Orders;
 import com.start.portfolio.entity.Product;
 import com.start.portfolio.entity.User;
+import com.start.portfolio.entity.args.AlarmArgs;
+import com.start.portfolio.enums.AlarmType;
 import com.start.portfolio.enums.OrderStatus;
+import com.start.portfolio.repository.AlarmRepository;
+import com.start.portfolio.repository.CartRepository;
 import com.start.portfolio.repository.FormRepository;
 import com.start.portfolio.repository.OrdersRepository;
 import com.start.portfolio.repository.ProductRepository;
@@ -29,6 +37,8 @@ public class FormService {
 	private final FormRepository formRepository;
 	private final ProductRepository productRepository;
 	private final OrdersRepository ordersRepository;
+	private final AlarmRepository alarmRepository;
+	private final CartRepository cartRepository;
 	private final OrderExceptionLogService orderExceptionLogService;
 	private final StockService stockService;
 
@@ -107,6 +117,48 @@ public class FormService {
 		} catch (RuntimeException e) {
 			orderExceptionLogService.saveLog(userId, e.getMessage());
 		}
+
+	}
+
+	@Transactional
+	public void alarm(Long userId, Long formId, AlarmDto.Request request) {
+		User user = userRepository.findById(userId)
+			.orElseThrow(() -> new RuntimeException("사용자가 없습니다."));
+
+		Form form = formRepository.findById(formId)
+			.orElseThrow(() -> new RuntimeException("삭제된 폼입니다."));
+
+		// TODO 좋아요 cart 에 담기
+		cartRepository.findByUserIdAndFormId(userId, formId).ifPresentOrElse(
+			cartRepository::delete,
+			() -> {
+				cartRepository.save(Cart.builder()
+					.user(user)
+					.form(form)
+					.build());
+
+				// TODO 알람 저장하기
+				alarmRepository.save(
+					Alarm.builder()
+						.registeredAt(request.registeredAt())
+						.user(form.getUser())
+						.alarmType(request.alarmType())
+						.alarmArgs(AlarmArgs.builder()
+							.fromUserId(user.getId())
+							.formId(formId)
+							.build())
+						.build());
+			}
+		);
+	}
+
+	@Transactional
+	public List<Response> alarmList(Long userId) {
+		User user = userRepository.findById(userId)
+			.orElseThrow(() -> new RuntimeException("사용자가 없습니다."));
+
+		return alarmRepository.findAllByUser(user).stream()
+			.map(Alarm::toDto).toList();
 
 	}
 }
