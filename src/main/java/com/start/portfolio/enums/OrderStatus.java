@@ -1,5 +1,10 @@
 package com.start.portfolio.enums;
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+
+@Getter
+@RequiredArgsConstructor
 public enum OrderStatus {
 	CREATED("주문 생성"),
 	PAID("결제 완료"),
@@ -8,12 +13,4 @@ public enum OrderStatus {
 	CANCELLED("주문 취소");
 
 	private final String description;
-
-	OrderStatus(String description) {
-		this.description = description;
-	}
-
-	public String getDescription() {
-		return description;
-	}
 }

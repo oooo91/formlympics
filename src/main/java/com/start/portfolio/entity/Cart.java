@@ -9,6 +9,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -30,4 +31,12 @@ public class Cart {
 	@JoinColumn(name ="form_id")
 	private Form form;
 
+	@Builder
+	Cart(
+		User user,
+		Form form
+	) {
+		this.user = user;
+		this.form = form;
+	}
 }
