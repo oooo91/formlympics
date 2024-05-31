@@ -1,6 +1,7 @@
 package com.start.portfolio.entity;
 
 import com.start.portfolio.dto.FormDto;
+import com.start.portfolio.dto.FormDto.Request;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -40,7 +41,7 @@ public class Form {
 	private List<Product> product;
 
 	@OneToMany(mappedBy = "form", fetch = FetchType.LAZY)
-	private List<Cart> carts;
+	private List<Cart> cart;
 
 	private String title;
 	private String content;
@@ -74,13 +75,15 @@ public class Form {
 			.build();
 	}
 
+	public void increaseLike() {
+		this.likes += 1;
+	}
+
 	// TODO Form 업데이트
-	public Form update(FormDto.Request request) {
+	public void update(Request request) {
 		this.title = request.title();
 		this.content = request.content();
 		this.depositStartDate = request.depositStartDate();
 		this.depositEndDate = request.depositEndDate();
-
-		return this;
 	}
 }

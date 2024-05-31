@@ -56,7 +56,7 @@ public class User {
 	private List<Form> form;
 
 	@OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
-	private List<Cart> likes;
+	private List<Cart> cart;
 
 	@CreationTimestamp
 	private LocalDateTime createdAt;

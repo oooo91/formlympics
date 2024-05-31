@@ -12,7 +12,6 @@ import com.start.portfolio.entity.Orders;
 import com.start.portfolio.entity.Product;
 import com.start.portfolio.entity.User;
 import com.start.portfolio.entity.args.AlarmArgs;
-import com.start.portfolio.enums.AlarmType;
 import com.start.portfolio.enums.OrderStatus;
 import com.start.portfolio.repository.AlarmRepository;
 import com.start.portfolio.repository.CartRepository;
@@ -120,6 +119,7 @@ public class FormService {
 
 	}
 
+	// TODO user, form 과 강한 결합 -> 분리 필요
 	@Transactional
 	public void alarm(Long userId, Long formId, AlarmDto.Request request) {
 		User user = userRepository.findById(userId)
@@ -128,16 +128,21 @@ public class FormService {
 		Form form = formRepository.findById(formId)
 			.orElseThrow(() -> new RuntimeException("삭제된 폼입니다."));
 
-		// TODO 좋아요 cart 에 담기
+		// TODO 이미 좋아요를 누른 경우 -> 장바구니 삭제 / 그렇지 않은 경우 -> 장바구니 담기 + 폼 좋아요 증가 + 알람 저장하기
 		cartRepository.findByUserIdAndFormId(userId, formId).ifPresentOrElse(
 			cartRepository::delete,
 			() -> {
+				// TODO 사용자의 장바구니 담기
 				cartRepository.save(Cart.builder()
 					.user(user)
 					.form(form)
 					.build());
 
-				// TODO 알람 저장하기
+				// TODO 폼 좋아요 +1 증가
+				form.increaseLike();
+				formRepository.save(form);
+
+				// TODO 알람 저장
 				alarmRepository.save(
 					Alarm.builder()
 						.registeredAt(request.registeredAt())
