@@ -159,10 +159,7 @@ public class FormService {
 
 	@Transactional
 	public List<Response> alarmList(Long userId) {
-		User user = userRepository.findById(userId)
-			.orElseThrow(() -> new RuntimeException("사용자가 없습니다."));
-
-		return alarmRepository.findAllByUser(user).stream()
+		return alarmRepository.findAllByUserId(userId).stream()
 			.map(Alarm::toDto).toList();
 
 	}

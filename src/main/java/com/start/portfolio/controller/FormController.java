@@ -64,7 +64,7 @@ public class FormController {
 	}
 
 	// TODO 좋아요 받은 사람
-	@GetMapping("/alarm")
+	@PostMapping("/alarm")
 	public List<Response> alarmList(@CustomAuthUser Long userId) {
 		return formService.alarmList(userId);
 	}
