@@ -45,6 +45,6 @@
 - 추후 개발 및 기술적인 도전 계획
     - 채팅 API
     - 주문 내역 엑셀 다운로드 API
-    - QueryDSL 변경
+    - JPA 학습 후 → QueryDSL 변경
     - 모니터링
     - NGINX 배포
