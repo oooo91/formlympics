@@ -10,19 +10,23 @@ import java.util.Base64;
 import java.util.Date;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
+import org.springframework.util.ObjectUtils;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class JwtTokenProvider {
 
 	private static final String AUTHORIZATION = "AUTHORIZATION";
-	private static final String BEARER_TYPE = "BEARER";
+	public static final String BEARER_TYPE = "Bearer";
+	private final static List<String> TOKEN_IN_PARAM_URLS = List.of("/form/alarm/subscribe");
 
 	@Value("${jwt.secret}")
 	private String secretKey;
@@ -63,7 +67,19 @@ public class JwtTokenProvider {
 	}
 
 	public String resolveToken(HttpServletRequest request) {
-		return request.getHeader(AUTHORIZATION);
+
+		// TODO SSE -> 클라이언트 측의 이벤트 소스는 헤더에 토큰을 세팅하는 것을 지원하지 않으므로, 파라미터로 토큰을 보냄 -> 특정 URI 에 대한 토큰 처리 필요
+		if (TOKEN_IN_PARAM_URLS.contains(request.getRequestURI())) {
+			log.info("Request with {} check the query param", request.getRequestURI());
+			return request.getQueryString().split("=")[1].trim(); //token
+		} else {
+			String token = request.getHeader(AUTHORIZATION);
+			if (!ObjectUtils.isEmpty(token) && token.toLowerCase()
+				.startsWith(BEARER_TYPE.toLowerCase())) {
+				return token.substring(BEARER_TYPE.length()).trim(); //token
+			}
+		}
+		return null;
 	}
 
 	// 토큰의 유효성 + 만료일자 확인

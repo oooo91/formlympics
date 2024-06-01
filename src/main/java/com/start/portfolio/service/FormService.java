@@ -40,6 +40,7 @@ public class FormService {
 	private final CartRepository cartRepository;
 	private final OrderExceptionLogService orderExceptionLogService;
 	private final StockService stockService;
+	private final AlarmService alarmService;
 
 	@Transactional
 	public void saveForm(Long userId, FormDto.Request request) {
@@ -130,7 +131,11 @@ public class FormService {
 
 		// TODO 이미 좋아요를 누른 경우 -> 장바구니 삭제 / 그렇지 않은 경우 -> 장바구니 담기 + 폼 좋아요 증가 + 알람 저장하기
 		cartRepository.findByUserIdAndFormId(userId, formId).ifPresentOrElse(
-			cartRepository::delete,
+			cart -> {
+				cartRepository.delete(cart);
+				form.decreaseLike();
+				formRepository.save(form);
+			},
 			() -> {
 				// TODO 사용자의 장바구니 담기
 				cartRepository.save(Cart.builder()
@@ -143,7 +148,7 @@ public class FormService {
 				formRepository.save(form);
 
 				// TODO 알람 저장
-				alarmRepository.save(
+				Alarm alarm = alarmRepository.save(
 					Alarm.builder()
 						.registeredAt(request.registeredAt())
 						.user(form.getUser())
@@ -153,6 +158,9 @@ public class FormService {
 							.formId(formId)
 							.build())
 						.build());
+
+				// TODO 브라우저에게 새로운 알람이 발생했음을 알림
+				alarmService.send(alarm.getId(), form.getUser().getId());
 			}
 		);
 	}
@@ -161,6 +169,5 @@ public class FormService {
 	public List<Response> alarmList(Long userId) {
 		return alarmRepository.findAllByUserId(userId).stream()
 			.map(Alarm::toDto).toList();
-
 	}
 }

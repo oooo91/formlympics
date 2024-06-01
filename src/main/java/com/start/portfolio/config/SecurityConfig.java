@@ -42,7 +42,7 @@ public class SecurityConfig {
 						HttpMethod.POST, "/user/signup", "/user/signIn"
 					).permitAll()
 					.requestMatchers(
-						HttpMethod.GET, "/form"
+						HttpMethod.GET, "/form", "/alarm", "/main"
 					).permitAll()
 					.anyRequest().authenticated()
 			)
