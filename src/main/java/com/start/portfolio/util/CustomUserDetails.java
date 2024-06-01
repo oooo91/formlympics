@@ -1,5 +1,7 @@
 package com.start.portfolio.util;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.util.Collection;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -11,6 +13,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class CustomUserDetails implements UserDetails {
 
 	private Long id;
@@ -19,6 +22,7 @@ public class CustomUserDetails implements UserDetails {
 	private Collection<? extends GrantedAuthority> authorities;
 
 	@Override
+	@JsonIgnore // TODO Redis 캐싱 x
 	public Collection<? extends GrantedAuthority> getAuthorities() {
 		return authorities;
 	}
@@ -28,6 +32,7 @@ public class CustomUserDetails implements UserDetails {
 	}
 
 	@Override
+	@JsonIgnore
 	public String getPassword() {
 		return password;
 	}
@@ -38,21 +43,25 @@ public class CustomUserDetails implements UserDetails {
 	}
 
 	@Override
+	@JsonIgnore
 	public boolean isAccountNonExpired() {
 		return true;
 	}
 
 	@Override
+	@JsonIgnore
 	public boolean isAccountNonLocked() {
 		return true;
 	}
 
 	@Override
+	@JsonIgnore
 	public boolean isCredentialsNonExpired() {
 		return true;
 	}
 
 	@Override
+	@JsonIgnore
 	public boolean isEnabled() {
 		return true;
 	}
