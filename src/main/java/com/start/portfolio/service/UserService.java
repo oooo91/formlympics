@@ -33,7 +33,6 @@ public class UserService {
 	private final JwtTokenProvider jwtTokenProvider;
 	private final UserCacheRepository userCacheRepository;
 
-
 	@Transactional
 	public void signup(UserDto.SignUpRequest request) {
 		if (userRepository.existsByEmail(request.email())) {
@@ -57,7 +56,6 @@ public class UserService {
 			userCacheRepository.setUser(fetchedUser);
 			return fetchedUser;
 		});
-
 		// TODO 토큰 생성
 		return jwtTokenProvider.createToken(user.getEmail());
 	}
