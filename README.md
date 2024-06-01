@@ -42,6 +42,13 @@
         - 정확한 쿠폰 발급과 DB 의 정합성을 위해 RDS Lock 과 Redis 를 고려
             - 위 재고는 재고에만 lock 걸어주면 되므로 (재고 감소 로직) pessimistic lock 으로 락 구현 → 쿠폰 로직은 걸어야하는 락 구간이 길기 때문에 성능 불이익 발생
             - 인 메모리인 Redis 의 Redisson 으로 락 구현
+- **SSE 를 활용하여 알림 처리 구현**
+    - Polling, Long polling, SSE, web socket 고려
+        - Polling → 주기적으로 API 를 호출하므로 부하가 발생할 수 있음
+        - Long poliing → 요청을 보낸 후 업데이트 발생 시에 응답을 받을 수는 있으나, 업데이트 빈번하면 Polling 과 같이 부하가 발생하므로 적합하지 않다고 판단
+        - SSE (Server-Sent Event) → 서버에서 웹 브라우저로 이벤트를 전송하는 단방향 통신으로, 지속적인 연결을 유지하면서도, Polling 방식보다 트래픽 부하가 적음
+        - Web socker → 실시간 양방향 통신
+        - 양방향 통신을 고려하지 않아도 되는 알람 기능이므로 SSE 사용으로 최종 선택
 - **추후 개발 및 기술적인 도전 계획**
     - 채팅 API
     - 주문 내역 엑셀 다운로드 API
