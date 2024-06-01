@@ -40,6 +40,7 @@ public class FormService {
 	private final CartRepository cartRepository;
 	private final OrderExceptionLogService orderExceptionLogService;
 	private final StockService stockService;
+	private final AlarmService alarmService;
 
 	@Transactional
 	public void saveForm(Long userId, FormDto.Request request) {
@@ -143,7 +144,7 @@ public class FormService {
 				formRepository.save(form);
 
 				// TODO 알람 저장
-				alarmRepository.save(
+				Alarm alarm = alarmRepository.save(
 					Alarm.builder()
 						.registeredAt(request.registeredAt())
 						.user(form.getUser())
@@ -153,6 +154,9 @@ public class FormService {
 							.formId(formId)
 							.build())
 						.build());
+
+				// TODO 브라우저에게 새로운 알람이 발생했음을 알림
+				alarmService.send(alarm.getId(), form.getUser().getId());
 			}
 		);
 	}
@@ -161,6 +165,5 @@ public class FormService {
 	public List<Response> alarmList(Long userId) {
 		return alarmRepository.findAllByUserId(userId).stream()
 			.map(Alarm::toDto).toList();
-
 	}
 }

@@ -4,6 +4,7 @@ import com.start.portfolio.dto.AlarmDto;
 import com.start.portfolio.dto.AlarmDto.Response;
 import com.start.portfolio.dto.FormDto;
 import com.start.portfolio.dto.OrdersDto;
+import com.start.portfolio.service.AlarmService;
 import com.start.portfolio.service.FormService;
 import com.start.portfolio.util.annotation.CustomAuthUser;
 import java.util.List;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 @Slf4j
 @RestController // ResponseBody + Controller
@@ -25,6 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class FormController {
 
 	private final FormService formService;
+	private final AlarmService alarmService;
 
 	// TODO 판매폼 작성
 	@PostMapping("")
@@ -66,6 +69,11 @@ public class FormController {
 	@PostMapping("/alarm")
 	public List<Response> alarmList(@CustomAuthUser Long userId) {
 		return formService.alarmList(userId);
+	}
+
+	@GetMapping("/alarm/subscribe")
+	public SseEmitter subscribe(@CustomAuthUser Long userId) {
+		return alarmService.connectAlarm(userId);
 	}
 
 	// TODO DM

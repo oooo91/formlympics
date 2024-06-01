@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Alarm List</title>
+  <style>
+    .pagination button {
+      margin: 0 5px;
+    }
+  </style>
+</head>
+<body>
+
+<div id="alarm-container">
+
+</div>
+
+<script>
+
+  function getAlarms() {
+    const token = localStorage.getItem('token');
+    fetch(`/form/alarm?sort=id`, {
+      method: 'GET',
+      headers: {
+        'Authorization': 'Bearer ' + token,
+      },
+    })
+    .then(response => response.json())
+    .then(data => {
+      const alarms = data.result.content;
+      const alarmContainer = document.getElementById('alarm-container');
+      alarmContainer.innerHTML = '';
+      alarms.forEach(alarm => {
+        const alarmElement = document.createElement('div');
+        alarmElement.className = 'alarm';
+        alarmElement.innerText = alarm.text;
+        alarmContainer.appendChild(alarmElement);
+      });
+    })
+    .catch(error => {
+      console.log(error);
+      window.location.href = '/main';
+    });
+  }
+
+  // Initial load
+  // getAlarms();
+
+  // EventSource 객체를 사용하여 서버로부터 이벤트를 수신한다.
+  const token = localStorage.getItem('token');
+  const eventSource = new EventSource(`/form/alarm/subscribe?token=${token}`);
+
+  //open 이벤트 리스너 -> 서버로부터 "open" 이벤트를 받으면 SSE 연결이 열렸다는 메시지를 콘솔에 출력함
+  eventSource.addEventListener('open', function (event) {
+    console.log('connection opened');
+  });
+
+  //alarm 이벤트 리스너 -> 서버로부터 "alarm" 이벤트를 받으면 getAlarms 함수를 호출하여 알람 목록을 갱신함
+  eventSource.addEventListener('alarm', function (event) {
+    console.log(event.data);
+    getAlarms();
+  });
+
+  //error 이벤트 리스너 -> 서버로부터 "error" 이벤트를 받으면 SSE 연결에 오류가 발생했음을 콘솔로 출력하고, 연결이 닫혔을 때 연결을 종료함
+  eventSource.addEventListener('error', function (event) {
+    console.log(event.target.readyState);
+    if (event.target.readyState === EventSource.CLOSED) {
+      console.log('eventsource closed (' + event.target.readyState + ')');
+    }
+    eventSource.close();
+  });
+</script>
+
+</body>
+</html>
