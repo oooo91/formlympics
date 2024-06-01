@@ -1,5 +1,7 @@
 package com.start.portfolio.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.start.portfolio.dto.UserDto;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -27,6 +29,7 @@ import org.hibernate.annotations.CreationTimestamp;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class User {
 
 	@Id
@@ -38,26 +41,33 @@ public class User {
 	private String password;
 	private String phone;
 
+	@JsonIgnore // TODO Redis 캐싱 x
 	@OneToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "refund_id")
 	private Refund refund;
 
+	@JsonIgnore
 	@OneToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "address_id")
 	private Address address;
 
+	@JsonIgnore
 	@OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
 	private List<Orders> orders;
 
+	@JsonIgnore
 	@OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
 	private Set<UserCoupon> userCoupons;
 
+	@JsonIgnore
 	@OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
 	private List<Form> form;
 
+	@JsonIgnore
 	@OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
-	private List<Cart> likes;
+	private List<Cart> cart;
 
+	@JsonIgnore
 	@CreationTimestamp
 	private LocalDateTime createdAt;
 

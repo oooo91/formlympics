@@ -4,7 +4,8 @@ import com.start.portfolio.dto.AddressDto;
 import com.start.portfolio.dto.MyInfoDto;
 import com.start.portfolio.dto.RefundDto;
 import com.start.portfolio.dto.UserDto;
-import com.start.portfolio.facade.RedissonLockCouponFacade;
+import com.start.portfolio.repository.UserCacheRepository;
+import com.start.portfolio.util.facade.RedissonLockCouponFacade;
 import com.start.portfolio.service.UserService;
 import com.start.portfolio.util.annotation.CustomAuthUser;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +26,7 @@ public class UserController {
 
 	private final UserService userService;
 	private final RedissonLockCouponFacade redissonLockCouponFacade;
+	private final UserCacheRepository userCacheRepository;
 
 	// TODO 회원가입
 	@PostMapping("/signup")

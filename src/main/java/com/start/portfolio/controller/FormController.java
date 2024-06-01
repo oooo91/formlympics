@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
@@ -64,7 +63,7 @@ public class FormController {
 	}
 
 	// TODO 좋아요 받은 사람
-	@GetMapping("/alarm")
+	@PostMapping("/alarm")
 	public List<Response> alarmList(@CustomAuthUser Long userId) {
 		return formService.alarmList(userId);
 	}

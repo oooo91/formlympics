@@ -1,7 +1,6 @@
 package com.start.portfolio.entity;
 
 import com.start.portfolio.dto.AlarmDto;
-import com.start.portfolio.dto.FormDto;
 import com.start.portfolio.entity.args.AlarmArgs;
 import com.start.portfolio.enums.AlarmType;
 import com.start.portfolio.util.converter.AlarmArgsConverter;
@@ -18,7 +17,6 @@ import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Builder;

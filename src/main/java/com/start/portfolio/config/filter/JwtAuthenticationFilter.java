@@ -1,4 +1,4 @@
-package com.start.portfolio.filter;
+package com.start.portfolio.config.filter;
 
 import com.start.portfolio.util.JwtTokenProvider;
 import io.jsonwebtoken.JwtException;

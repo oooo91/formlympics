@@ -10,11 +10,13 @@ import com.start.portfolio.entity.Refund;
 import com.start.portfolio.entity.User;
 import com.start.portfolio.repository.AddressRepository;
 import com.start.portfolio.repository.RefundRepository;
+import com.start.portfolio.repository.UserCacheRepository;
 import com.start.portfolio.repository.UserRepository;
 import com.start.portfolio.util.JwtTokenProvider;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,7 +31,7 @@ public class UserService {
 	private final RefundRepository refundRepository;
 	private final PasswordEncoder passwordEncoder;
 	private final JwtTokenProvider jwtTokenProvider;
-
+	private final UserCacheRepository userCacheRepository;
 
 	@Transactional
 	public void signup(UserDto.SignUpRequest request) {
@@ -46,13 +48,16 @@ public class UserService {
 
 	@Transactional
 	public String signIn(SignInRequest request) {
-		if (!userRepository.existsByEmail(request.email())) {
-			throw new RuntimeException("가입되지 않은 이메일입니다.");
-		}
-		User user = userRepository.findByEmail(request.email())
-			.orElseThrow(() -> new RuntimeException("가입되지 않은 아이디입니다."));
 
-		return jwtTokenProvider.createToken(user.getId());
+		// TODO 로그인 시 아직 캐싱되어있다면 캐시에서 조회, 없다면 DB 조회 후 캐싱
+		User user = userCacheRepository.getUser(request.email()).orElseGet(() -> {
+			User fetchedUser = userRepository.findByEmail(request.email())
+				.orElseThrow(() -> new UsernameNotFoundException("사용자 정보가 없습니다."));
+			userCacheRepository.setUser(fetchedUser);
+			return fetchedUser;
+		});
+		// TODO 토큰 생성
+		return jwtTokenProvider.createToken(user.getEmail());
 	}
 
 	@Transactional
