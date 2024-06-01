@@ -1,12 +1,11 @@
 package com.start.portfolio.entity.args;
 
-import com.start.portfolio.entity.User;
-import com.start.portfolio.enums.AlarmType;
-import java.time.LocalDateTime;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
 public class AlarmArgs {
 
 	// TODO 알람 발생시킨 사람

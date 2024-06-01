@@ -25,7 +25,7 @@ public class AlarmService {
 				emitterRepository.delete(userId); //seller_id 에 보낼 때 문제가 생겼다면 굳이 seller_id SSE 저장할 필요 없음
 				throw new RuntimeException("알람에 문제가 발생했습니다.");
 			}
-		}, () -> log.info("seller_id 가 접속하지 않은 상태입니다."));
+		}, () -> log.info("{} 가 접속하지 않은 상태입니다.", userId));
 	}
 
 	// TODO SSE 생성 및 반환 (아래는 connect 되었을 때 connect 되었다고 이벤트 전송)

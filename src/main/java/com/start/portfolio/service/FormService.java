@@ -131,7 +131,11 @@ public class FormService {
 
 		// TODO 이미 좋아요를 누른 경우 -> 장바구니 삭제 / 그렇지 않은 경우 -> 장바구니 담기 + 폼 좋아요 증가 + 알람 저장하기
 		cartRepository.findByUserIdAndFormId(userId, formId).ifPresentOrElse(
-			cartRepository::delete,
+			cart -> {
+				cartRepository.delete(cart);
+				form.decreaseLike();
+				formRepository.save(form);
+			},
 			() -> {
 				// TODO 사용자의 장바구니 담기
 				cartRepository.save(Cart.builder()

@@ -18,6 +18,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.util.ObjectUtils;
 
 @Entity
 @Getter
@@ -76,7 +77,16 @@ public class Form {
 	}
 
 	public void increaseLike() {
-		this.likes += 1;
+		if (ObjectUtils.isEmpty(this.likes)) {
+			this.likes = 0L; // 초기값 설정
+		}
+		this.likes = this.likes + 1; // 현재 값에 1을 더하여 다시 Long 객체로 할당
+	}
+
+	public void decreaseLike() {
+		if (!ObjectUtils.isEmpty(this.likes)) {
+			this.likes = this.likes - 1;
+		}
 	}
 
 	// TODO Form 업데이트
