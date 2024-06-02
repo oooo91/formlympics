@@ -1,8 +1,14 @@
-프로젝트 명 : 폼림픽
+### 프로젝트 명 : 폼림픽
 
 2024.05.20 ~
 
 빠른 시간 내에 폼으로 주문하여 선착순으로 상품을 구매하는 C2C 플랫폼 입니다.
+
+### ERD
+<img src="https://github.com/oooo91/formlympics/assets/74234719/3daf341b-d440-4cdf-a2f6-9a76aaee1bf8" alt="Image" width="900"/>
+
+
+### 담당 역할
 
 - **가독성 향상**
     - record 를 도입하여 별도의 애노테이션 없이 코드 작성
@@ -12,6 +18,11 @@
     - 중복 코드 최적화
         - 문제 → Token 인증 시 user 를 조회하고, 그 이후 비즈니스 로직에서 다시 user 를 조회하는 구조로 데이터베이스 I/O 증가
         - 해결 → 유저 정보 (이름, 패스워드)는 거의 변하지 않으므로 Redis 를 사용하여 캐싱 적용
+        - 2번의 쿼리 → 1번의 쿼리
+      <br>
+      
+        <img src="https://github.com/oooo91/formlympics/assets/74234719/3dad30bd-0788-4a64-a4ea-f58b95c4e6d0" alt="Image" width="700"/>
+
 - **Resolver를 적용한 인증 권한 예외 처리**
     - 문제 → Controller 에서 직접 Authentication 으로부터 유저ID 를 추출
     - 해결
@@ -49,9 +60,96 @@
         - SSE (Server-Sent Event) → 서버에서 웹 브라우저로 이벤트를 전송하는 단방향 통신으로, 지속적인 연결을 유지하면서도, Polling 방식보다 트래픽 부하가 적음
         - Web socker → 실시간 양방향 통신
         - 양방향 통신을 고려하지 않아도 되는 알람 기능이므로 SSE 사용으로 최종 선택
-- **추후 개발 및 기술적인 도전 계획**
-    - 채팅 API
-    - 주문 내역 엑셀 다운로드 API
-    - JPA 학습 후 → QueryDSL 변경 및 성능 개선
-    - 모니터링
-    - NGINX 배포
+
+
+### 트러블 슈팅
+- pessimistic lock 으로 구현한 부분을 redisson 으로 변경하는 과정에서 오류가 발생
+- 해결
+    - 락을 획득/해제는 트랜잭션의 단위보다 크게 이루어져야 하나, 반대로 트랜잭션이 먼저 시작돼서 문제가 발생한 것으로 예상된다.
+    - 다음과 같이 락을 획득한 후 트랜잭션을 실행한도록 코드를 수정했다.
+```
+//RedissonLockCouponFacade 
+@Slf4j
+@Component
+@RequiredArgsConstructor
+public class RedissonLockCouponFacade {
+
+	private final RedissonClient redissonClient;
+	private final CouponService couponService;
+
+	public void getCoupon(Long userId, Long couponId) {
+		RLock lock = redissonClient.getLock(couponId.toString());
+		try {
+			boolean available = lock.tryLock(10, 1, TimeUnit.SECONDS); //락을 시도하는 최대 시간, 락의 만료 시간(락을 획득하면 1초 동안 유지
+			if (!available) {
+				log.warn("LOCK 획득 실패");
+				return;
+			}
+
+			log.info("LOCK 획득");
+			couponService.getCoupon(userId, couponId);
+
+		} catch (InterruptedException e) {
+			log.warn("LOCK 획득 실패 - 예외 발생: {}", e.getMessage());
+			throw new RuntimeException(e);
+		} catch (Exception e) {
+			log.error("예상치 못한 에러 발생: {}", e.getMessage());
+			throw new RuntimeException(e);
+		} finally {
+			lock.unlock();
+			log.info("LOCK 해제");
+		}
+	}
+}
+```
+```
+//CouponService 
+@Slf4j
+@Service
+@RequiredArgsConstructor
+public class CouponService {
+
+	private final UserRepository userRepository;
+	private final UserCouponRepository userCouponRepository;
+	private final CouponRepository couponRepository;
+
+	@Transactional
+	public void getCoupon(Long userId, Long couponId) {
+
+		userCouponRepository.findByUserIdAndCouponId(
+			userId, couponId).ifPresent(userCoupon -> {
+			throw new CouponOutOfStockException("이미 쿠폰이 발급되었습니다.");
+		});
+
+		User user = userRepository.findById(userId)
+			.orElseThrow(() -> new RuntimeException("존재하지 않는 사용자입니다."));
+
+		Coupon coupon = couponRepository.findById(couponId)
+			.orElseThrow(() -> new RuntimeException("존재하지 않는 쿠폰입니다."));
+
+		Long issuedCouponCount = coupon.getIssuedCouponCount();
+		//Long count = couponCountRepository.increment();
+		log.info("race condition = {}", issuedCouponCount);
+
+		if (issuedCouponCount >= coupon.getTotalCouponQuantity()) {
+			return;
+		}
+		coupon.update();
+
+		couponRepository.save(coupon);
+		userCouponRepository.save(UserCoupon.builder()
+			.user(user)
+			.coupon(coupon)
+			.build());
+	}
+}
+```
+
+### 추후 개발 및 기술적인 도전 계획
+- 채팅 API
+- 주문 내역 엑셀 다운로드 API
+- JPA 학습 후 → QueryDSL 변경 및 성능 개선
+- 모니터링
+- NGINX 배포
+ 
+
