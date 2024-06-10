@@ -13,8 +13,8 @@ public class PageController {
 	}
 
 	// TODO 알람 페이지 test
-	@GetMapping("/login")
+	@GetMapping("/main")
 	public String getLoginPage() {
-		return "/login";
+		return "/main";
 	}
 }
