@@ -48,6 +48,8 @@ class CouponServiceTest {
 	@Test
 	@DisplayName("여러 번 응모")
 	public void concurrentCouponApplications() throws InterruptedException {
+		//이 코드는 32개의 스레드로 구성된 스레드 풀을 생성
+		//threadCount 만큼의 작업을 스레드 풀에 제출하여 동시에 요청
 		int threadCount = 1000;
 		long startTime = System.currentTimeMillis();
 

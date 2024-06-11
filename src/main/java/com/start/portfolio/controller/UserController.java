@@ -44,7 +44,6 @@ public class UserController {
 	@PostMapping("/address")
 	public ResponseEntity<String> saveAddress(@CustomAuthUser Long userId,
 		@RequestBody AddressDto.Request request) {
-		log.info("들어오나..." + userId);
 		userService.saveAddress(userId, request);
 		return ResponseEntity.ok("주소저장 성공");
 	}

@@ -45,7 +45,7 @@ class KafkaConfig {
 	public ConsumerFactory<Long, AlarmEvent> consumerFactory() {
 		Map<String, Object> configurationProperties = new HashMap<>();
 		configurationProperties.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, BOOTSTRAP_SERVER);
-		configurationProperties.put(ConsumerConfig.GROUP_ID_CONFIG, "alarm");
+		configurationProperties.put(ConsumerConfig.GROUP_ID_CONFIG, "consumer_group_alarm");
 		configurationProperties.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest");
 		configurationProperties.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG,
 			LongDeserializer.class);

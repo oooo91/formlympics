@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 public enum AlarmTopic {
-	ALARM_REQUEST("ALARM");
+	ALARM_REQUEST("alarm");
 
 	private final String name;
 }
