@@ -43,7 +43,6 @@ public class FormService {
 	private final CartRepository cartRepository;
 	private final OrderExceptionLogService orderExceptionLogService;
 	private final StockService stockService;
-	private final AlarmService alarmService;
 	private final AlarmProducer alarmProducer;
 
 	@Transactional

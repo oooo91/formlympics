@@ -13,6 +13,11 @@ public class GlobalExceptionHandler {
 		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ex.getMessage());
 	}
 
+	@ExceptionHandler(SnsApplicationException.class)
+	public ResponseEntity<String> snsApplicationException(Exception ex) {
+		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+	}
+
 	@ExceptionHandler(CouponOutOfStockException.class)
 	public ResponseEntity<String> handleCouponOutOfStockException(CouponOutOfStockException ex) {
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
