@@ -13,6 +13,9 @@ import com.start.portfolio.entity.Product;
 import com.start.portfolio.entity.User;
 import com.start.portfolio.entity.args.AlarmArgs;
 import com.start.portfolio.enums.OrderStatus;
+import com.start.portfolio.kafka.dto.AlarmEvent;
+import com.start.portfolio.kafka.enums.AlarmTopic;
+import com.start.portfolio.kafka.producer.AlarmProducer;
 import com.start.portfolio.repository.AlarmRepository;
 import com.start.portfolio.repository.CartRepository;
 import com.start.portfolio.repository.FormRepository;
@@ -40,7 +43,7 @@ public class FormService {
 	private final CartRepository cartRepository;
 	private final OrderExceptionLogService orderExceptionLogService;
 	private final StockService stockService;
-	private final AlarmService alarmService;
+	private final AlarmProducer alarmProducer;
 
 	@Transactional
 	public void saveForm(Long userId, FormDto.Request request) {
@@ -147,20 +150,14 @@ public class FormService {
 				form.increaseLike();
 				formRepository.save(form);
 
-				// TODO 알람 저장
-				Alarm alarm = alarmRepository.save(
-					Alarm.builder()
-						.registeredAt(request.registeredAt())
-						.user(form.getUser())
-						.alarmType(request.alarmType())
-						.alarmArgs(AlarmArgs.builder()
-							.fromUserId(user.getId())
-							.formId(formId)
-							.build())
-						.build());
-
-				// TODO 브라우저에게 새로운 알람이 발생했음을 알림
-				alarmService.send(alarm.getId(), form.getUser().getId());
+				// TODO 알람 이벤트 생성
+				alarmProducer.send(
+					AlarmTopic.ALARM_REQUEST,
+					new AlarmEvent(
+						form.getUser().getId(),
+						request.alarmType(),
+						new AlarmArgs(user.getId(), formId))
+				);
 			}
 		);
 	}

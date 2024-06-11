@@ -68,6 +68,20 @@ public class Alarm {
 		this.alarmType = alarmType;
 	}
 
+	public static Alarm of(
+		User user,
+		AlarmType alarmType,
+		AlarmArgs alarmArgs
+	) {
+		Alarm alarm = new Alarm();
+		alarm.setUser(user);
+		alarm.setAlarmType(alarmType);
+		alarm.setAlarmArgs(alarmArgs);
+		alarm.setRegisteredAt(LocalDateTime.now());
+
+		return alarm;
+	}
+
 	// TODO Dto 로 파싱
 	public AlarmDto.Response toDto() {
 		return AlarmDto.Response.builder()

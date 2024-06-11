@@ -1,6 +1,13 @@
 package com.start.portfolio.service;
 
+import com.start.portfolio.entity.Alarm;
+import com.start.portfolio.entity.User;
+import com.start.portfolio.entity.args.AlarmArgs;
+import com.start.portfolio.enums.AlarmType;
+import com.start.portfolio.exception.SnsApplicationException;
+import com.start.portfolio.repository.AlarmRepository;
 import com.start.portfolio.repository.EmitterRepository;
+import com.start.portfolio.repository.UserRepository;
 import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,17 +22,25 @@ public class AlarmService {
 	private final static Long DEFAULT_TIMEOUT = 60 * 1000 * 60L;
 	private final static String ALARM_NAME = "alarm";
 	private final EmitterRepository emitterRepository;
+	private final UserRepository userRepository;
+	private final AlarmRepository alarmRepository;
 
 	//TODO seller_id 가 브라우저에 접속한 상태여야 인스턴스를 만들어서 가지게 되므로 EmitterRepository 의 get() 을 Optional 로 감싼다.
-	public void send(Long alarmId, Long userId) { //알람, 보낼 애
-		emitterRepository.get(userId).ifPresentOrElse(sseEmitter -> {
+	public void send(AlarmType type, AlarmArgs alarmArgs, Long receiverUserId) { //kafka 로부터 받은 알람, 보낼 애
+		//alarm => save
+		User user = userRepository.findById(receiverUserId)
+			.orElseThrow(() -> new SnsApplicationException("사용자가 존재하지 않습니다."));
+		Alarm alarm = alarmRepository.save(Alarm.of(user, type, alarmArgs));
+
+		//sse => push
+		emitterRepository.get(receiverUserId).ifPresentOrElse(sseEmitter -> {
 			try {
-				sseEmitter.send(SseEmitter.event().id(alarmId.toString()).name(ALARM_NAME).data("new alarm"));
+				sseEmitter.send(SseEmitter.event().id(alarm.getId().toString()).name(ALARM_NAME).data("new alarm"));
 			} catch (IOException e) {
-				emitterRepository.delete(userId); //seller_id 에 보낼 때 문제가 생겼다면 굳이 seller_id SSE 저장할 필요 없음
+				emitterRepository.delete(receiverUserId); //seller_id 에 보낼 때 문제가 생겼다면 굳이 seller_id SSE 저장할 필요 없음
 				throw new RuntimeException("알람에 문제가 발생했습니다.");
 			}
-		}, () -> log.info("{} 가 접속하지 않은 상태입니다.", userId));
+		}, () -> log.info("{} 가 접속하지 않은 상태입니다.", receiverUserId));
 	}
 
 	// TODO SSE 생성 및 반환 (아래는 connect 되었을 때 connect 되었다고 이벤트 전송)
