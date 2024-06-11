@@ -1,8 +1,8 @@
 package com.start.portfolio.repository;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -12,8 +12,8 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 public class EmitterRepository {
 
 	// TODO Local Cache 로 인스턴스 저장 -> 단, 분산 서버에서는 어려움 (user1 한테 알람이 가야하는데, 알람이 생성된 게 서버2라면 서버2에는 user1의 브라우저가 없으므로 보내줄 수 x)
-	// 따라서 전체 서버 인스턴스에 user1에 알람이 발생했음을 알림 -> 인스턴스 중 user1(브라우저)에 커넥트된 서버 인스턴스가 이를 확인하도록 구현해야함 -> 아직 고려 x
-	private final Map<String, SseEmitter> emitterMap = new HashMap<>();
+	// TODO 따라서 전체 서버 인스턴스에 user1에 알람이 발생했음을 알림 -> 인스턴스 중 user1(브라우저)에 커넥트된 서버 인스턴스가 이를 확인하도록 구현해야함 -> Redis sub/sub
+	private final Map<String, SseEmitter> emitterMap = new ConcurrentHashMap<>(); //동시성
 
 	// TODO 알람을 받는 유저 ID (seller_id) 로 접속한 브라우저를 찾아야한다.
 	public SseEmitter save(Long userId, SseEmitter sseEmitter) {
