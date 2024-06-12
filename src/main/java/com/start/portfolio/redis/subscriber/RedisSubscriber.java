@@ -45,7 +45,6 @@ public class RedisSubscriber implements MessageListener {
 
 			// 알람 저장
 			Alarm alarm = alarmRepository.save(Alarm.of(user, type, alarmArgs));
-			log.info("저장이 되었는가요오오오오오오 {}", alarm);
 
 			// SSE 이벤트 보내기
 			emitterRepository.get(receiverUserId).ifPresentOrElse(sseEmitter -> {
@@ -55,7 +54,7 @@ public class RedisSubscriber implements MessageListener {
 							+ "에 좋아요를 눌렀습니다."));
 					log.info(alarmArgs.getFormUserName() + "이 " + alarmArgs.getFormTitle() + "에 좋아요를 눌렀습니다.");
 				} catch (IOException e) {
-					emitterRepository.delete(receiverUserId);
+					emitterRepository.delete(receiverUserId); //seller_id 에 보낼 때 문제가 생겼다면 굳이 seller_id SSE 저장할 필요 없음
 					throw new RuntimeException("알람에 문제가 발생했습니다.");
 				}
 			}, () -> log.info("{} 가 접속하지 않은 상태입니다.", receiverUserId));
