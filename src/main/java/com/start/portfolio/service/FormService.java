@@ -152,7 +152,6 @@ public class FormService {
 
 				// TODO 알람 이벤트 생성 -> 비동기
 				alarmProducer.send(
-					AlarmTopic.ALARM_REQUEST,
 					new AlarmEvent(
 						form.getUser().getId(),
 						request.alarmType(),

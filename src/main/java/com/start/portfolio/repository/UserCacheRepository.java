@@ -1,5 +1,6 @@
 package com.start.portfolio.repository;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.start.portfolio.entity.User;
 import java.time.Duration;
 import java.util.Optional;
@@ -13,18 +14,20 @@ import org.springframework.stereotype.Repository;
 @RequiredArgsConstructor
 public class UserCacheRepository {
 
-	private final RedisTemplate<String, User> userRedisTemplate;
+	private final RedisTemplate<String, Object> redisTemplate;
 	private final static Duration USER_CACHE_TTL = Duration.ofDays(3);
+	private final ObjectMapper objectMapper;  // Jackson ObjectMapper
 
 	public void setUser(User user) {
 		String key = getKey(user.getEmail());
 		log.info("set user to redis {} , {}", key, user);
-		userRedisTemplate.opsForValue().set(key, user, USER_CACHE_TTL);
+		redisTemplate.opsForValue().set(key, user, USER_CACHE_TTL);
 	}
 
 	public Optional<User> getUser(String username) { //username = email
 		String key = getKey(username);
-		User user = userRedisTemplate.opsForValue().get(key);
+		Object data = redisTemplate.opsForValue().get(key);
+		User user = objectMapper.convertValue(data, User.class);
 		log.info("get data from redis {} , {}", key, user);
 		return Optional.ofNullable(user);
 	}

@@ -3,74 +3,59 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Alarm List</title>
+  <title>SSE Test Page</title>
   <style>
-    .pagination button {
-      margin: 0 5px;
+    /* CSS 스타일링 */
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f4;
+    }
+    .container {
+      max-width: 800px;
+      margin: 20px auto;
+      padding: 20px;
+      background-color: #fff;
+      border-radius: 5px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    .message {
+      padding: 10px;
+      margin-bottom: 10px;
+      border-radius: 5px;
+      background-color: #f0f0f0;
     }
   </style>
 </head>
 <body>
-
-<div id="alarm-container">
-
+<div class="container">
+  <h1>SSE Test Page</h1>
+  <div id="messages"></div>
 </div>
 
 <script>
-
-  function getAlarms() {
-    const token = localStorage.getItem('token');
-    fetch(`/form/alarm?sort=id`, {
-      method: 'GET',
-      headers: {
-        'Authorization': 'Bearer ' + token,
-      },
-    })
-    .then(response => response.json())
-    .then(data => {
-      const alarms = data.result.content;
-      const alarmContainer = document.getElementById('alarm-container');
-      alarmContainer.innerHTML = '';
-      alarms.forEach(alarm => {
-        const alarmElement = document.createElement('div');
-        alarmElement.className = 'alarm';
-        alarmElement.innerText = alarm.text;
-        alarmContainer.appendChild(alarmElement);
-      });
-    })
-    .catch(error => {
-      console.log(error);
-      window.location.href = '/main';
-    });
-  }
-
-  // Initial load
-  // getAlarms();
-
-  // EventSource 객체를 사용하여 서버로부터 이벤트를 수신한다.
-  const token = localStorage.getItem('token');
+  // 서버로부터 알람 이벤트를 수신하는 EventSource 객체 생성
+  const token = 'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlbWFpbF90ZXN0XzEiLCJpYXQiOjE3MTgyMjAyMTIsImV4cCI6MTcxODIyMjAxMn0.CC5OJvl9ai7HziuEg991zun_hnWFdyCxECxSdPJtA14';
   const eventSource = new EventSource(`/form/alarm/subscribe?token=${token}`);
 
-  //open 이벤트 리스너 -> 서버로부터 "open" 이벤트를 받으면 SSE 연결이 열렸다는 메시지를 콘솔에 출력함
-  eventSource.addEventListener('open', function (event) {
-    console.log('connection opened');
-  });
-
-  //alarm 이벤트 리스너 -> 서버로부터 "alarm" 이벤트를 받으면 getAlarms 함수를 호출하여 알람 목록을 갱신함
+  // 알람 이벤트를 수신하는 리스너 등록
   eventSource.addEventListener('alarm', function (event) {
-    console.log(event.data);
-    getAlarms();
+    // 수신한 메시지를 출력하는 함수 호출
+    displayMessage(event.data);
   });
 
-  //error 이벤트 리스너 -> 서버로부터 "error" 이벤트를 받으면 SSE 연결에 오류가 발생했음을 콘솔로 출력하고, 연결이 닫혔을 때 연결을 종료함
-  eventSource.addEventListener('error', function (event) {
-    console.log(event.target.readyState);
-    if (event.target.readyState === EventSource.CLOSED) {
-      console.log('eventsource closed (' + event.target.readyState + ')');
-    }
-    eventSource.close();
-  });
+  // 메시지를 동적으로 화면에 출력하는 함수
+  function displayMessage(message) {
+    // 메시지를 담을 div 엘리먼트 생성
+    const messageDiv = document.createElement('div');
+    messageDiv.classList.add('message');
+    messageDiv.innerText = message;
+
+    // 화면에 메시지를 추가
+    const messagesContainer = document.getElementById('messages');
+    messagesContainer.appendChild(messageDiv);
+  }
 </script>
-
 </body>
 </html>

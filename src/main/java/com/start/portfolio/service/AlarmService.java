@@ -26,7 +26,7 @@ public class AlarmService {
 	private final AlarmRepository alarmRepository;
 
 	//TODO receiverUserId 가 페이지에 접속한 상태여야 연결 인스턴스를 가지므로 EmitterRepository 의 get() 을 Optional 로 감싼다.
-	public void send(AlarmType type, AlarmArgs alarmArgs, Long receiverUserId) {
+/*	public void send(AlarmType type, AlarmArgs alarmArgs, Long receiverUserId) {
 		//alarm => save
 		User user = userRepository.findById(receiverUserId)
 			.orElseThrow(() -> new SnsApplicationException("사용자가 존재하지 않습니다."));
@@ -43,7 +43,7 @@ public class AlarmService {
 				throw new RuntimeException("알람에 문제가 발생했습니다.");
 			}
 		}, () -> log.info("{} 가 접속하지 않은 상태입니다.", receiverUserId));
-	}
+	}*/
 
 	// TODO SSE 생성 및 반환 (아래는 connect 되었을 때 connect 되었다고 이벤트 전송)
 	public SseEmitter connectAlarm(Long userId) {
