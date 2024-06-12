@@ -11,5 +11,7 @@ public class AlarmArgs {
 
 	// TODO 알람 발생시킨 사람
 	private Long fromUserId;
+	private String formUserName;
 	private Long formId;
+	private String formTitle;
 }

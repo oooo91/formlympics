@@ -125,14 +125,14 @@ public class FormService {
 
 	// TODO user, form 과 강한 결합 -> 분리 필요
 	@Transactional
-	public void alarm(Long userId, Long formId, AlarmDto.Request request) {
+	public void like(Long userId, Long formId, AlarmDto.Request request) {
 		User user = userRepository.findById(userId)
 			.orElseThrow(() -> new RuntimeException("사용자가 없습니다."));
 
 		Form form = formRepository.findById(formId)
 			.orElseThrow(() -> new RuntimeException("삭제된 폼입니다."));
 
-		// TODO 이미 좋아요를 누른 경우 -> 장바구니 삭제 / 그렇지 않은 경우 -> 장바구니 담기 + 폼 좋아요 증가 + 알람 저장하기
+		// TODO 이미 좋아요를 누른 경우 -> 장바구니 삭제 / 그렇지 않은 경우 -> 장바구니 담기 + 폼 좋아요 증가 + 알람 이벤트 생성
 		cartRepository.findByUserIdAndFormId(userId, formId).ifPresentOrElse(
 			cart -> {
 				cartRepository.delete(cart);
@@ -150,13 +150,12 @@ public class FormService {
 				form.increaseLike();
 				formRepository.save(form);
 
-				// TODO 알람 이벤트 생성
+				// TODO 알람 이벤트 생성 -> 비동기
 				alarmProducer.send(
-					AlarmTopic.ALARM_REQUEST,
 					new AlarmEvent(
 						form.getUser().getId(),
 						request.alarmType(),
-						new AlarmArgs(user.getId(), formId))
+						new AlarmArgs(user.getId(), user.getName(), formId, form.getTitle()))
 				);
 			}
 		);

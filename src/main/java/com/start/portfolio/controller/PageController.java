@@ -11,10 +11,4 @@ public class PageController {
 	public String getAlarmPage() {
 		return "/alarm";
 	}
-
-	// TODO 알람 페이지 test
-	@GetMapping("/main")
-	public String getLoginPage() {
-		return "/main";
-	}
 }

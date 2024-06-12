@@ -62,7 +62,7 @@ public class FormController {
 	// TODO 좋아요 누른 사람
 	@PostMapping("/alarm/{id}")
 	public void alarm(@RequestBody AlarmDto.Request request, @CustomAuthUser Long userId, @PathVariable(name = "id") Long formId) {
-		formService.alarm(userId, formId, request);
+		formService.like(userId, formId, request);
 	}
 
 	// TODO 좋아요 받은 사람

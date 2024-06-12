@@ -71,6 +71,7 @@ public class JwtTokenProvider {
 		// TODO SSE -> 클라이언트 측의 이벤트 소스는 헤더에 토큰을 세팅하는 것을 지원하지 않으므로, 파라미터로 토큰을 보냄 -> 특정 URI 에 대한 토큰 처리 필요
 		if (TOKEN_IN_PARAM_URLS.contains(request.getRequestURI())) {
 			log.info("Request with {} check the query param", request.getRequestURI());
+			log.info("access token {} of query param", request.getQueryString().split("=")[1].trim());
 			return request.getQueryString().split("=")[1].trim(); //token
 		} else {
 			String token = request.getHeader(AUTHORIZATION);

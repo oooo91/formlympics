@@ -25,8 +25,8 @@ public class AlarmService {
 	private final UserRepository userRepository;
 	private final AlarmRepository alarmRepository;
 
-	//TODO seller_id 가 브라우저에 접속한 상태여야 인스턴스를 만들어서 가지게 되므로 EmitterRepository 의 get() 을 Optional 로 감싼다.
-	public void send(AlarmType type, AlarmArgs alarmArgs, Long receiverUserId) { //kafka 로부터 받은 알람, 보낼 애
+	//TODO receiverUserId 가 페이지에 접속한 상태여야 연결 인스턴스를 가지므로 EmitterRepository 의 get() 을 Optional 로 감싼다.
+/*	public void send(AlarmType type, AlarmArgs alarmArgs, Long receiverUserId) {
 		//alarm => save
 		User user = userRepository.findById(receiverUserId)
 			.orElseThrow(() -> new SnsApplicationException("사용자가 존재하지 않습니다."));
@@ -35,16 +35,18 @@ public class AlarmService {
 		//sse => push
 		emitterRepository.get(receiverUserId).ifPresentOrElse(sseEmitter -> {
 			try {
-				sseEmitter.send(SseEmitter.event().id(alarm.getId().toString()).name(ALARM_NAME).data("new alarm"));
+				sseEmitter.send(SseEmitter.event().id(alarm.getId().toString()).name(ALARM_NAME)
+					.data(alarmArgs.getFormUserName() + "이 " + alarmArgs.getFormTitle()
+						+ "에 좋아요를 눌렀습니다."));
 			} catch (IOException e) {
-				emitterRepository.delete(receiverUserId); //seller_id 에 보낼 때 문제가 생겼다면 굳이 seller_id SSE 저장할 필요 없음
+				emitterRepository.delete(receiverUserId);
 				throw new RuntimeException("알람에 문제가 발생했습니다.");
 			}
 		}, () -> log.info("{} 가 접속하지 않은 상태입니다.", receiverUserId));
-	}
+	}*/
 
 	// TODO SSE 생성 및 반환 (아래는 connect 되었을 때 connect 되었다고 이벤트 전송)
-	public SseEmitter connectAlarm(Long userId) { //내가 만든 connect
+	public SseEmitter connectAlarm(Long userId) {
 		SseEmitter sseEmitter = new SseEmitter(DEFAULT_TIMEOUT);
 		emitterRepository.save(userId, sseEmitter);
 
@@ -53,11 +55,11 @@ public class AlarmService {
 
 		try {
 			sseEmitter.send(
-				SseEmitter //SSE 는 브라우저 connect 당 하나의 인스턴스가 생성된다. -> 즉 해당 알람이 일어난 브라우저 (SSE) 를 찾아야한다. -> 따라서 SSE 인스턴스를 저장할 클래스가 필요하다.
-				.event()
-				.id("id") // 이벤트의 ID 설정, 이벤트 ID -> 서버가 클라이언트에 전송하는 각 이벤트에 부여하는 고유한 식별자 -> 클라이언트는 이 ID 로 중단된 시점 이후의 이벤트를 다시 받을 수 있다. (브라우저의 EventSource 객체는 이벤트 ID 를 자동 처리함, 내부적으로 마지막으로 수신한 이벤트 ID 를 기억함)
-				.name(ALARM_NAME) // 이벤트의 이름 설정, 클라이언트가 구독한 이벤트에 대한 전송임을 알린다.
-				.data("connect completed")); // 이벤트의 데이터 설정, 단순히 "connect completed"라는 메시지를 전송했다.
+				SseEmitter //SSE 는 브라우저 connect 당 하나의 SSE 인스턴스 생성 (연결 생성)
+					.event()
+					.id("id")
+					.name(ALARM_NAME)
+					.data("connect completed"));
 		} catch (IOException e) {
 			throw new RuntimeException("알람에 문제가 발생했습니다.");
 		}
