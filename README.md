@@ -16,7 +16,6 @@
       <br>
       
         <img src="https://github.com/oooo91/formlympics/assets/74234719/3dad30bd-0788-4a64-a4ea-f58b95c4e6d0" alt="Image" width="700"/>
-
 - **Resolver를 적용한 인증 권한 예외 처리**
     - 상황 → Controller 에서 매번 Authentication 으로부터 유저ID 를 직접 추출 → 코드 중복
     - 해결
@@ -67,6 +66,7 @@
             - RabbitMQ → 수평확장이 어려움
             - Redis Pub/Sub →  메시지의 손실이나 중복 전달 가능
             - 선착순 쿠폰 지급 로직에서도 알람 사용 → 대량의 트래픽이 발생할 것을 고려하여 분산 처리 및 중복성 없는 전송이 가능한 Kafka 를 채택하여 알람 처리
+      <img src="https://github.com/oooo91/formlympics/assets/74234719/052d01c4-4696-4307-8b9e-aa1f83a7acd5" alt="Image" width="700"/>
 
 ### 트러블 슈팅
 - pessimistic lock 으로 구현한 부분을 redisson 으로 변경하는 과정에서 오류가 발생
